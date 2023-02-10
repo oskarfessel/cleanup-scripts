@@ -1,0 +1,18 @@
+#!/bin/sh
+
+# remove all distfiles for the same package except the newest one 
+
+DISTFD=/usr/pkgsrc/distfiles
+
+cd ${DISTFD} || exit 1
+
+files=$(find . -type f | sort -u | sed 's/-[0-9]*\..*$//;s/^\.\///' | uniq -d )
+
+for i in $files
+do
+        x=$(find . -name ${i}-[0-9]\* | sed 's/^\.\///')
+        for j in $x
+        do
+                [ -f "$j" ] && find . -name ${i}-[0-9]\* -not -name $j -not -newer $j -rm
+        done
+done
