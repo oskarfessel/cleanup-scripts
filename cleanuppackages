@@ -1,0 +1,22 @@
+#!/bin/sh
+
+# remove all instances of a prebuilt package, only keep newest.
+# for simplicity this compares timestamps, so do not copy older 
+# packages into the package directory, or you migt get unexpected results.
+# on the positive siede, this helps greatly when needing to rollback a package
+# 
+PKGDIR=/usr/pkgsrc/packages/All
+
+cd ${PKGDIR} || exit 1
+
+files=$(find . -type f | sort -u | sed 's/-[0-9]*\..*$//;s/^\.\///' | uniq -d )
+
+for i in $files
+do
+	echo $i
+        x=$(find . -name ${i}-[0-9]\* | sed 's/^\.\///')
+        for j in $x
+        do
+                [ -f "$j" ] && find . -name ${i}-[0-9]\* -not -name $j -not -newer $j -rm
+        done
+done
